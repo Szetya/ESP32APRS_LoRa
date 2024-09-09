@@ -6058,7 +6058,7 @@ void taskGPS(void *pvParameters)
                             setTime(timeGps);
                             time_t rtc = timeGps - (config.timeZone * SECS_PER_HOUR);
                             timeval tv = {rtc, 0};
-                            timezone tz = {(config.timeZone * SECS_PER_HOUR), 0};
+                            timezone tz = {static_cast<int>(config.timeZone * SECS_PER_HOUR), 0};
                             settimeofday(&tv, &tz);
                             log_d("\nSET GPS Timestamp = %u Year=%d\n", timeGps, year());
                             // firstGpsTime = false;
