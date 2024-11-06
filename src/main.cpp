@@ -3370,6 +3370,10 @@ void setup()
         pinMode(LED_RX, OUTPUT);
     if (LED_TX > -1)
         pinMode(LED_TX, OUTPUT);
+#ifdef ST7735_160x80	// Init before ledcwrite
+	ledcSetup(0,5000,8);
+	ledcAttachPin(ST7735_LED_K_Pin,0);
+#endif
 
         // pinMode(0, INPUT);
         // pinMode(1, INPUT);
@@ -3595,8 +3599,8 @@ void setup()
     TFT_SPI.begin(ST7735_SCLK_Pin, -1, ST7735_MOSI_Pin, ST7735_CS_Pin);
     TFT_SPI.setFrequency(40000000);
     //pinMode(ST7735_LED_K_Pin, OUTPUT);
-    ledcSetup(0,5000,8);
-    ledcAttachPin(ST7735_LED_K_Pin,0);
+    //ledcSetup(0,5000,8);
+    //ledcAttachPin(ST7735_LED_K_Pin,0);
     ledcWrite(0, config.disp_brightness);
     display.initR(ST7735_MODEL); // initialize a ST7735S chip, mini display
     if(config.disp_flip)
