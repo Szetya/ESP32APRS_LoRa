@@ -7861,7 +7861,7 @@ void taskAPRS(void *pvParameters)
                     }
                     b <<= 1;
                 }
-                // sendTelemetry_0(rawTlm, false);
+                sendTelemetry_0(rawTlm, false);
             }
         }
     }
@@ -9823,7 +9823,7 @@ void statisticsDisp()
 #elif defined(ST7735_160x80)
     display.fillRect(0, 0, 160, 15, WHITE);
     //display.drawRect(0, 16, 160, 64, WHITE);
-    display.fillRect(0, 15, 160, 64, BLACK);
+    display.fillRect(0, 15, 160, 65, BLACK);
 
     display.setCursor(20, 7);
     display.setTextSize(1);
@@ -9981,7 +9981,7 @@ void pkgLastDisp()
 #elif defined(ST7735_160x80)
     display.fillRect(0, 0, 160, 15, WHITE);
     //display.drawRect(0, 16, 160, 64, WHITE);
-    display.fillRect(0, 15, 160, 64, BLACK);
+    display.fillRect(0, 15, 160, 65, BLACK);
 
     display.setCursor(30, 7);
     display.setTextSize(1);
@@ -10146,7 +10146,7 @@ void pkgCountDisp()
 #elif defined(ST7735_160x80)
     display.fillRect(0, 0, 160, 15, WHITE);
     //display.drawRect(0, 16, 160, 64, WHITE);
-    display.fillRect(0, 15, 160, 64, BLACK);
+    display.fillRect(0, 15, 160, 65, BLACK);
 
     display.setCursor(35, 7);
     display.setTextSize(1);
@@ -10301,7 +10301,7 @@ void systemDisp()
 #elif defined(ST7735_160x80)
     display.fillRect(0, 0, 160, 15, WHITE);
     //display.drawRect(0, 16, 160, 64, WHITE);
-    display.fillRect(0, 15, 160, 64, BLACK);
+    display.fillRect(0, 15, 160, 65, BLACK);
 
     display.setCursor(35, 7);
     display.setTextSize(1);
@@ -10435,7 +10435,7 @@ void wifiDisp()
 #elif defined(ST7735_160x80)
     display.fillRect(0, 0, 160, 15, WHITE);
     //display.drawRect(0, 16, 160, 64, WHITE);
-    display.fillRect(0, 15, 160, 64, BLACK);
+    display.fillRect(0, 15, 160, 65, BLACK);
 
     display.setCursor(35, 7);
     display.setTextSize(1);
@@ -10572,7 +10572,7 @@ void radioDisp()
 #elif defined(ST7735_160x80)
     display.fillRect(0, 0, 160, 15, WHITE);
     //display.drawRect(0, 16, 160, 64, WHITE);
-    display.fillRect(0, 15, 160, 64, BLACK);
+    display.fillRect(0, 15, 160, 65, BLACK);
 
     display.setCursor(25, 7);
     display.setTextSize(1);
@@ -10671,7 +10671,7 @@ void sensorDisp()
 #elif defined(ST7735_160x80)
     display.fillRect(0, 0, 160, 15, WHITE);
     //display.drawRect(0, 16, 160, 64, WHITE);
-    display.fillRect(0, 15, 160, 64, BLACK);
+    display.fillRect(0, 15, 160, 65, BLACK);
 
     display.setCursor(35, 7);
     display.setTextSize(1);
@@ -10844,7 +10844,7 @@ void gpsDisp()
     {
         display.fillRect(0, 0, 160, 15, WHITE);
         //display.drawRect(0, 16, 160, 64, WHITE);
-        display.fillRect(0, 15, 160, 64, BLACK);
+        display.fillRect(0, 15, 160, 65, BLACK);
 
         display.setCursor(35, 7);
         display.setTextSize(1);
