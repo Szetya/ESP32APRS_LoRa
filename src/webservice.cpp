@@ -570,8 +570,11 @@ void handle_sysinfo(AsyncWebServerRequest *request)
 	html += "</tr>\n";
 	html += "<tr>\n";
 	time_t tn = time(NULL) - systemUptime;
-	// String uptime = String(day(tn) - 1, DEC) + "D " + String(hour(tn), DEC) + ":" + String(minute(tn), DEC) + ":" + String(second(tn), DEC);
-	String uptime = String(day(tn) - 1, DEC) + "D " + String(hour(tn), DEC) + ":" + String(minute(tn), DEC);
+	// Formatted time D HH:MM:SS
+	String uptime = String(day(tn) - 1) + "D " +
+                (hour(tn) < 10 ? "0" : "") + String(hour(tn)) + ":" +
+                (minute(tn) < 10 ? "0" : "") + String(minute(tn)) + ":" +
+                (second(tn) < 10 ? "0" : "") + String(second(tn));
 	html += "<td><b>" + uptime + "</b></td>\n";
 	html += "<td><b>" + String((float)ESP.getFreeHeap() / 1000, 1) + "/" + String((float)ESP.getHeapSize() / 1000, 1) + "</b></td>\n";
 #ifdef BUOY
@@ -8335,6 +8338,10 @@ void handle_about(AsyncWebServerRequest *request)
 	webString += "APRS LoRa Dongle,ESP32-S3 DIY";
 #elif defined(TTGO_T_Beam_V1_2_SX1262) || defined(TTGO_T_Beam_V1_2_SX1268)
 	webString += "TTGO_T_Beam_V1_2_SX1262,TTGO_T_Beam_V1_2_SX1268";
+#elif defined(BV5DJ_BOARD)
+	webString += "BV5DJ DIY";
+#elif defined(TTGO_LORA32_V21)
+	webString += "LILYGO LoRa32 T3 V2.1";
 #endif
 	webString += "</td></tr>";
 	webString += "<tr><td align=\"right\"><b>Firmware Version: </b></td><td align=\"left\"> V" + String(VERSION) + String(VERSION_BUILD) + "</td></tr>\n";
