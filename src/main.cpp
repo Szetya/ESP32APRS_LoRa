@@ -96,50 +96,42 @@ XPowersAXP2101 PMU;
 #endif
 #define LED_RX -1
 
-#if APRS_LORA_DONGLE
-#include <Adafruit_NeoPixel.h>
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
-
-// portMUX_TYPE ledMux = portMUX_INITIALIZER_UNLOCKED;
-void IRAM_ATTR LED_Status(uint8_t r, uint8_t g, uint8_t b)
-{
-    // portENTER_CRITICAL_ISR(&ledMux);          // ISR start
-    strip.setPixelColor(0, strip.Color(r, g, b));
-    strip.show();
-    // portEXIT_CRITICAL_ISR(&ledMux);
-}
-#elif defined(BV5DJ_BOARD)
-#include <Adafruit_NeoPixel.h>
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(2, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
-
-// portMUX_TYPE ledMux = portMUX_INITIALIZER_UNLOCKED;
-void IRAM_ATTR LED_Status(uint8_t r, uint8_t g, uint8_t b)
-{
-    // portENTER_CRITICAL_ISR(&ledMux);          // ISR start
-    strip.setPixelColor(0, strip.Color(r, g, b));
-    strip.show();
-    // portEXIT_CRITICAL_ISR(&ledMux);
-}
+#ifdef PIXELS_PIN
+    #include <Adafruit_NeoPixel.h>
+    #if APRS_LORA_DONGLE
+        #define PIXELS_NUM 1
+    #elif BV5DJ_BOARD
+        #define PIXELS_NUM 2
+    #endif
+        Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXELS_NUM, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
+        // portMUX_TYPE ledMux = portMUX_INITIALIZER_UNLOCKED;
+        void IRAM_ATTR LED_Status(uint8_t r, uint8_t g, uint8_t b)
+        {
+            // portENTER_CRITICAL_ISR(&ledMux);          // ISR start
+            strip.setPixelColor(0, strip.Color(r, g, b));
+            strip.show();
+            // portEXIT_CRITICAL_ISR(&ledMux);
+        }
 #else
-void IRAM_ATTR LED_Status(uint8_t r, uint8_t g, uint8_t b)
-{
-    // portENTER_CRITICAL_ISR(&ledMux);          // ISR start
-    if (LED_TX > -1)
-    {
-        if (r > 0)
-            digitalWrite(LED_TX, HIGH);
-        else
-            digitalWrite(LED_TX, LOW);
-    }
-    if (LED_RX > -1)
-    {
-        if (g > 0)
-            digitalWrite(LED_RX, HIGH);
-        else
-            digitalWrite(LED_RX, LOW);
-    }
-    // portEXIT_CRITICAL_ISR(&ledMux);
-}
+    void IRAM_ATTR LED_Status(uint8_t r, uint8_t g, uint8_t b)
+        {
+            // portENTER_CRITICAL_ISR(&ledMux);          // ISR start
+            if (LED_TX > -1)
+            {
+                if (r > 0)
+                    digitalWrite(LED_TX, HIGH);
+                else
+                    digitalWrite(LED_TX, LOW);
+            }
+            if (LED_RX > -1)
+            {
+                if (g > 0)
+                    digitalWrite(LED_RX, HIGH);
+                else
+                    digitalWrite(LED_RX, LOW);
+            }
+            // portEXIT_CRITICAL_ISR(&ledMux);
+        }
 #endif
 
 bool i2c_busy = false;
@@ -968,12 +960,14 @@ void PowerOn(){
 	ledcWrite(0, (uint32_t)config.disp_brightness);
 	#endif
     //Power ON
-    if(config.pwr_active){
-        pinMode(config.pwr_gpio, OUTPUT);
-        digitalWrite(config.pwr_gpio, HIGH);
-    }else{
-        pinMode(config.pwr_gpio, OPEN_DRAIN);
-        digitalWrite(config.pwr_gpio, LOW);
+    if (config.pwr_gpio > -1) {
+        if(config.pwr_active){
+            pinMode(config.pwr_gpio, OUTPUT);
+            digitalWrite(config.pwr_gpio, HIGH);
+        }else{
+            pinMode(config.pwr_gpio, OPEN_DRAIN);
+            digitalWrite(config.pwr_gpio, LOW);
+        }
     }
 }
 
@@ -982,12 +976,14 @@ void PowerOff(){
 	ledcWrite(0, 0);
 	#endif
     //Power OFF
-    if(config.pwr_active){
-        pinMode(config.pwr_gpio, OUTPUT);
-        digitalWrite(config.pwr_gpio, LOW);
-    }else{
-        pinMode(config.pwr_gpio, INPUT_PULLUP);
-        digitalWrite(config.pwr_gpio, HIGH);
+    if (config.pwr_gpio > -1) {
+        if(config.pwr_active){
+            pinMode(config.pwr_gpio, OUTPUT);
+            digitalWrite(config.pwr_gpio, LOW);
+        }else{
+            pinMode(config.pwr_gpio, INPUT_PULLUP);
+            digitalWrite(config.pwr_gpio, HIGH);
+        }
     }
 }
 
@@ -3549,14 +3545,18 @@ RTC_DATA_ATTR uint8_t curTab;
 
 void preTransmission()
 {
-    pinMode(config.modbus_de_gpio,OUTPUT);
-    digitalWrite(config.modbus_de_gpio, 1);
+    if (config.modbus_de_gpio > -1) {
+        pinMode(config.modbus_de_gpio, OUTPUT);
+        digitalWrite(config.modbus_de_gpio, 1);
+    }
 }
 
 void postTransmission()
 {
-    pinMode(config.modbus_de_gpio,OUTPUT);
-    digitalWrite(config.modbus_de_gpio, 0);
+    if (config.modbus_de_gpio > -1) {
+        pinMode(config.modbus_de_gpio, OUTPUT);
+        digitalWrite(config.modbus_de_gpio, 0);
+    }
 }
 
 // 3 seconds WDT
@@ -3585,10 +3585,17 @@ void setup()
     memset(txQueue, 0, sizeof(txQueueType) * PKGTXSIZE);
 
     // pinMode(9, INPUT_PULLUP); // BOOT Button
-    if (LED_RX > -1)
-        pinMode(LED_RX, OUTPUT);
-    if (LED_TX > -1)
-        pinMode(LED_TX, OUTPUT);
+    #ifndef PIXELS_PIN
+        if (LED_RX > -1)
+            pinMode(LED_RX, OUTPUT);
+        if (LED_TX > -1)
+            pinMode(LED_TX, OUTPUT);
+    #endif
+    // ledcSetup before ledcWrite
+    #ifdef ST7735_160x80
+	    ledcSetup(0,5000,8);
+        ledcAttachPin(ST7735_LED_K_Pin,0);
+    #endif
 
         // pinMode(0, INPUT);
         // pinMode(1, INPUT);
@@ -3736,22 +3743,12 @@ void setup()
     // }
     i2c_busy = true;
     // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
-    if (OLED_RESET > -1)
-    {
-        #ifdef SH1106
-        display.begin(SH1106_SWITCHCAPVCC, 0x3C, true); // initialize with the I2C addr 0x3C (for the 128x64)
-        #else
-        display.begin(SSD1306_SWITCHCAPVCC, 0x3C, true, false); // initialize with the I2C addr 0x3C (for the 128x64)
-        #endif
-    }
-    else
-    {
-        #ifdef SH1106
-        display.begin(SH1106_SWITCHCAPVCC, 0x3C, false); // initialize with the I2C addr 0x3C (for the 128x64)
-        #else
-        display.begin(SSD1306_SWITCHCAPVCC, 0x3C, false, false); // initialize with the I2C addr 0x3C (for the 128x64)
-        #endif
-    }
+    #ifdef SH1106
+        display.begin(SH1106_SWITCHCAPVCC, 0x3C, OLED_RESET > -1);
+    #else
+        display.begin(SSD1306_SWITCHCAPVCC, 0x3C, OLED_RESET > -1, false);
+    #endif
+
     // Initialising the UI will init the display too.
     if (BootReason != ESP_RST_DEEPSLEEP)
     {
@@ -3837,8 +3834,8 @@ if (config.i2c_enable)
     TFT_SPI.begin(ST7735_SCLK_Pin, -1, ST7735_MOSI_Pin, ST7735_CS_Pin);
     TFT_SPI.setFrequency(40000000);
     //pinMode(ST7735_LED_K_Pin, OUTPUT);
-    ledcSetup(0,5000,8);
-    ledcAttachPin(ST7735_LED_K_Pin,0);
+    //ledcSetup(0,5000,8);
+    //ledcAttachPin(ST7735_LED_K_Pin,0);
     ledcWrite(0, config.disp_brightness);
     display.initR(ST7735_MODEL); // initialize a ST7735S chip, mini display
     if(config.disp_flip)
